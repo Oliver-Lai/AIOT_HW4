@@ -7,47 +7,83 @@ import streamlit as st
 from pathlib import Path
 from typing import Optional, Dict, Any
 import time
+import os
 
 
 @st.cache_resource
-def load_model(model_path: str = "models/qwen2-0.5b-instruct"):
+def load_model(model_path: Optional[str] = None):
     """
-    Load Qwen2 model and tokenizer from local directory.
+    Load Qwen2 model and tokenizer.
+    Supports both local path and Hugging Face Hub.
     Uses Streamlit cache to avoid reloading on every rerun.
     
     Args:
-        model_path: Path to local model directory
+        model_path: Path to local model directory or HF model ID.
+                   If None, uses environment variable MODEL_PATH or defaults to HF Hub.
         
     Returns:
         Tuple of (model, tokenizer) or (None, None) if loading fails
     """
     try:
         from transformers import AutoTokenizer, AutoModelForCausalLM
+        import torch
         
+        # Determine model source
+        if model_path is None:
+            # Check environment variable first (for Streamlit Cloud secrets)
+            model_path = os.getenv('MODEL_PATH', 'Qwen/Qwen2-0.5B-Instruct')
+        
+        # Check if it's a local path
         model_dir = Path(model_path)
-        if not model_dir.exists():
-            st.error(f"模型目錄不存在: {model_dir}")
-            st.info("請執行: `python scripts/download_models.py --size 0.5B`")
-            return None, None
+        is_local = model_dir.exists() and model_dir.is_dir()
         
-        # Load tokenizer
-        tokenizer = AutoTokenizer.from_pretrained(
-            str(model_dir),
-            local_files_only=True
-        )
-        
-        # Load model
-        model = AutoModelForCausalLM.from_pretrained(
-            str(model_dir),
-            local_files_only=True,
-            device_map="auto",
-            trust_remote_code=True
-        )
+        if is_local:
+            st.info(f"📁 從本地載入模型: {model_path}")
+            # Load tokenizer
+            tokenizer = AutoTokenizer.from_pretrained(
+                str(model_dir),
+                local_files_only=True
+            )
+            
+            # Load model
+            model = AutoModelForCausalLM.from_pretrained(
+                str(model_dir),
+                local_files_only=True,
+                device_map="auto",
+                trust_remote_code=True
+            )
+        else:
+            # Download from Hugging Face Hub
+            st.info(f"☁️ 從 Hugging Face Hub 下載模型: {model_path}")
+            st.warning("⏳ 首次下載需要 3-5 分鐘，請耐心等候...")
+            
+            # Load tokenizer
+            tokenizer = AutoTokenizer.from_pretrained(
+                model_path,
+                trust_remote_code=True
+            )
+            
+            # Load model with optimizations for cloud deployment
+            model = AutoModelForCausalLM.from_pretrained(
+                model_path,
+                trust_remote_code=True,
+                torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
+                device_map="auto",
+                low_cpu_mem_usage=True  # Important for Streamlit Cloud
+            )
+            
+            st.success("✓ 模型下載並載入成功！")
         
         return model, tokenizer
         
     except Exception as e:
-        st.error(f"模型載入失敗: {str(e)}")
+        st.error(f"❌ 模型載入失敗: {str(e)}")
+        st.info("""
+        **解決方案：**
+        - 本地部署：執行 `python scripts/download_models.py` 下載模型
+        - Streamlit Cloud：模型會自動從 Hugging Face Hub 下載
+        - 如遇到記憶體問題，請聯絡管理員
+        """)
         return None, None
 
 

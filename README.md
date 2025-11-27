@@ -12,13 +12,15 @@
 
 ## 🚀 快速開始
 
-### 1. 安裝依賴
+### 本地部署
+
+#### 1. 安裝依賴
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 2. 下載模型
+#### 2. 下載模型（本地部署需要）
 
 ```bash
 python scripts/download_models.py
@@ -26,7 +28,7 @@ python scripts/download_models.py
 
 模型會下載到 `models/qwen2-0.5b-instruct/` 目錄（約 3GB）。
 
-### 3. 啟動應用
+#### 3. 啟動應用
 
 **方法 A: 使用啟動腳本（推薦）**
 ```bash
@@ -39,6 +41,23 @@ streamlit run app.py
 ```
 
 應用會在 `http://localhost:8501` 啟動。
+
+### ☁️ Streamlit Cloud 部署
+
+**無需下載模型！** 應用會自動從 Hugging Face Hub 下載。
+
+```bash
+# 1. 推送到 GitHub
+git add .
+git commit -m "Add Chinglish Generator"
+git push
+
+# 2. 訪問 https://share.streamlit.io/
+# 3. 選擇你的倉庫和 app.py
+# 4. 點擊 Deploy
+```
+
+詳細步驟請見 [STREAMLIT_CLOUD.md](STREAMLIT_CLOUD.md)
 
 ## 📖 使用說明
 
