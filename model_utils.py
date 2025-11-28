@@ -63,14 +63,18 @@ def load_model(model_path: Optional[str] = None):
                 trust_remote_code=True
             )
             
-            # Load model with optimizations for cloud deployment
+            # Load model with aggressive memory optimizations for Streamlit Cloud
             model = AutoModelForCausalLM.from_pretrained(
                 model_path,
                 trust_remote_code=True,
                 torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
-                device_map="auto",
-                low_cpu_mem_usage=True  # Important for Streamlit Cloud
+                device_map="cpu",  # Force CPU to avoid device conflicts
+                low_cpu_mem_usage=True,  # Critical for Streamlit Cloud
+                use_cache=False  # Disable KV cache to save memory
             )
+            
+            # Set model to eval mode to save memory
+            model.eval()
             
             st.success("✓ 模型下載並載入成功！")
         
@@ -177,25 +181,35 @@ def generate_chinglish_text(
         }
     
     try:
+        # Import torch here to avoid 'torch' is not defined error
+        import torch
+        
         start_time = time.time()
         
         # Create prompt
         prompt = create_chinglish_prompt(topic.strip())
         
         # Tokenize
-        inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
+        inputs = tokenizer(prompt, return_tensors="pt", truncation=True, max_length=512)
         
-        # Generate with timeout handling
+        # Move to same device as model
+        if hasattr(model, 'device'):
+            inputs = inputs.to(model.device)
+        
+        # Generate with timeout handling and memory optimization
         with st.spinner('🤖 正在生成晶晶體文字...'):
-            outputs = model.generate(
-                **inputs,
-                max_new_tokens=max_length,
-                temperature=temperature,
-                top_p=top_p,
-                do_sample=True,
-                pad_token_id=tokenizer.eos_token_id,
-                eos_token_id=tokenizer.eos_token_id
-            )
+            with torch.no_grad():  # Disable gradient computation to save memory
+                outputs = model.generate(
+                    **inputs,
+                    max_new_tokens=min(max_length, 150),  # Limit tokens to reduce memory
+                    temperature=temperature,
+                    top_p=top_p,
+                    do_sample=True,
+                    pad_token_id=tokenizer.eos_token_id,
+                    eos_token_id=tokenizer.eos_token_id,
+                    use_cache=True,  # Enable during generation for efficiency
+                    num_beams=1  # Greedy decoding to save memory
+                )
         
         generation_time = time.time() - start_time
         
@@ -229,15 +243,18 @@ def generate_chinglish_text(
             st.warning('⚠️ 生成的文字語言不夠混合，正在重試...')
             
             retry_start = time.time()
-            outputs = model.generate(
-                **inputs,
-                max_new_tokens=max_length,
-                temperature=min(temperature + 0.15, 1.0),  # Increase randomness
-                top_p=top_p,
-                do_sample=True,
-                pad_token_id=tokenizer.eos_token_id,
-                eos_token_id=tokenizer.eos_token_id
-            )
+            with torch.no_grad():
+                outputs = model.generate(
+                    **inputs,
+                    max_new_tokens=min(max_length, 150),
+                    temperature=min(temperature + 0.15, 1.0),  # Increase randomness
+                    top_p=top_p,
+                    do_sample=True,
+                    pad_token_id=tokenizer.eos_token_id,
+                    eos_token_id=tokenizer.eos_token_id,
+                    use_cache=True,
+                    num_beams=1
+                )
             
             if (time.time() - retry_start) > timeout:
                 return {

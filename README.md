@@ -4,9 +4,9 @@
 
 本專案是一個創新的 AI 應用，專門生成「晶晶體」風格的文字內容並轉換為語音。晶晶體是留學生或海外工作者常見的語言現象，特色是中英文自然混合使用，英文比例約 60-70%，主要用於名詞和動詞，中文則用於連接詞和語氣詞。
 
-系統採用 Qwen2-0.5B-Instruct 輕量級語言模型，結合精心設計的 Prompt 工程，能夠根據用戶輸入的主題（如「週末計畫」、「咖啡廳閒聊」）生成自然流暢的晶晶體文字。生成的內容會透過 Google Text-to-Speech (gTTS) 引擎轉換為語音，讓使用者可以直接聆聽和下載。
+系統採用 **Qwen/Qwen2-0.5B-Instruct** 輕量級語言模型（500M 參數），結合精心設計的 Prompt 工程，能夠根據用戶輸入的主題（如「週末計畫」、「咖啡廳閒聊」）生成自然流暢的晶晶體文字。生成的內容會透過 Google Text-to-Speech (gTTS) 引擎轉換為語音，讓使用者可以直接聽聽和下載。
 
-整個應用基於 Streamlit 框架開發，提供簡潔直觀的 Web 介面，支援本地部署和雲端部署兩種模式。本地部署使用預先下載的模型檔案（約 3GB），而 Streamlit Cloud 部署則自動從 Hugging Face Hub 下載模型，無需手動處理大型檔案。系統包含完整的錯誤處理、超時保護、記憶體優化等機制，並通過 5 個測試腳本驗證，測試通過率 100%。
+整個應用基於 Streamlit 框架開發，提供簡潔直觀的 Web 介面，支援本地部署和雲端部署兩種模式。本地部署使用預先下載的模型檔案（約 3GB），而 Hugging Face space部署則自動從 Hugging Face Hub 下載模型，無需手動處理大型檔案。系統包含完整的錯誤處理、超時保護、記憶體優化等機制，並通過 5 個測試腳本驗證，測試通過率 100%。
 
 專案包含超過 1,500 行 Python 代碼和 1,200 行文檔，涵蓋開發、測試、部署的完整流程，適合作為 NLP 和 TTS 整合應用的學習範例。
 
@@ -146,6 +146,11 @@
 
 ## 🚀 快速開始
 
+> 💡 **部署建議**：
+> - **本地使用**：按下方步驟操作
+> - **雲端部署**：推薦使用 [Hugging Face Spaces](HUGGINGFACE_SPACES.md)（免費 2GB RAM）
+> - **Streamlit Cloud**：免費版僅 1GB RAM，可能不足（見 [記憶體優化](MEMORY_OPTIMIZATION.md)）
+
 ### 本地部署
 
 #### 1. 安裝依賴
@@ -178,17 +183,29 @@ streamlit run app.py
 
 ### ☁️ Streamlit Cloud 部署
 
-**無需下載模型！** 應用會自動從 Hugging Face Hub 下載。
+⚠️ **重要提醒：Streamlit Cloud 免費版有記憶體限制（~1GB RAM）**
+
+Qwen2-0.5B 模型可能接近或超過此限制。已實施記憶體優化，但如遇到 "resource limits" 錯誤：
+
+**建議方案：**
+1. **Hugging Face Spaces**（推薦，免費且資源更多）
+2. 升級 Streamlit Cloud 付費方案
+3. 使用其他平台（Railway, Render, Google Cloud）
+
+詳見：[MEMORY_OPTIMIZATION.md](MEMORY_OPTIMIZATION.md)
+
+**如仍要嘗試 Streamlit Cloud：**
 
 ```bash
 # 1. 推送到 GitHub
 git add .
-git commit -m "Add Chinglish Generator"
+git commit -m "Add Chinglish Generator with memory optimization"
 git push
 
 # 2. 訪問 https://share.streamlit.io/
 # 3. 選擇你的倉庫和 app.py
 # 4. 點擊 Deploy
+# 5. 首次啟動需 3-5 分鐘下載模型
 ```
 
 詳細步驟請見 [STREAMLIT_CLOUD.md](STREAMLIT_CLOUD.md)
@@ -205,10 +222,10 @@ git push
 
 ### 核心組件
 
-- **語言模型**: Qwen2-0.5B-Instruct (Hugging Face Transformers)
+- **語言模型**: Qwen/Qwen2-0.5B-Instruct (500M 參數，Hugging Face)
 - **TTS 引擎**: Google Text-to-Speech (gTTS)
 - **Web 框架**: Streamlit
-- **深度學習**: PyTorch
+- **深度學習**: PyTorch + Transformers
 
 ### 項目結構
 

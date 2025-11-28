@@ -29,6 +29,8 @@ def init_session_state():
         st.session_state.audio_path = None
     if 'generation_count' not in st.session_state:
         st.session_state.generation_count = 0
+    if 'topic' not in st.session_state:
+        st.session_state.topic = ''
 
 
 def main():
@@ -147,16 +149,20 @@ def main():
     with col1:
         topic = st.text_input(
             "你想聊什麼？",
+            value=st.session_state.topic,
             placeholder="例如：週末計畫、咖啡廳閒聊、健身房...",
             max_chars=200,
-            help="輸入任何你想要生成晶晶體文字的主題"
+            help="輸入任何你想要生成晶晶體文字的主題",
+            key="topic_input"
         )
+        # Update session state
+        st.session_state.topic = topic
     
     with col2:
         st.markdown("**快速選擇:**")
         for example in example_topics[:3]:
             if st.button(example, key=f"example_{example}"):
-                topic = example
+                st.session_state.topic = example
                 st.rerun()
     
     # Generate button
