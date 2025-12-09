@@ -1,0 +1,49 @@
+# EMNIST Character Recognition - Python Dependencies
+
+# Deep Learning Framework
+tensorflow>=2.16.0
+# Note: Use tensorflow-cpu for CPU-only environments
+# tensorflow-cpu>=2.16.0
+
+# Alternative: PyTorch (uncomment if using PyTorch instead)
+# torch>=1.13.0
+# torchvision>=0.14.0
+
+# Web Framework
+streamlit>=1.25.0
+
+# Interactive Drawing Component
+streamlit-drawable-canvas>=0.9.0
+
+# Core Scientific Computing
+numpy>=1.23.0,<2.0.0
+pandas>=1.5.0
+
+# Image Processing
+opencv-python-headless>=4.7.0  # Headless version for server environments
+Pillow>=9.0.0
+
+# Visualization
+matplotlib>=3.5.0
+seaborn>=0.12.0
+
+# Machine Learning Utilities
+scikit-learn>=1.2.0
+
+# Data Handling
+h5py>=3.7.0
+
+# Progress Bars
+tqdm>=4.64.0
+
+# Jupyter Support (for notebooks)
+jupyter>=1.0.0
+ipykernel>=6.20.0
+
+# Testing (optional, for development)
+pytest>=7.2.0
+pytest-cov>=4.0.0
+
+# Code Quality (optional, for development)
+black>=23.0.0
+flake8>=6.0.0
