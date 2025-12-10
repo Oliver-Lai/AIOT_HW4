@@ -55,6 +55,20 @@ AIOT_HW4/
 ├── models/
 │   ├── emnist_cnn_v1.keras    # Trained CNN model (20.5 MB)
 │   └── label_mapping.json     # Character class mappings
+├── src/                        # Source code modules
+│   ├── models/
+│   │   ├── __init__.py
+│   │   └── cnn.py             # CNN model architecture
+│   ├── preprocessing/
+│   │   ├── __init__.py
+│   │   └── preprocessing.py   # Data preprocessing utilities
+│   ├── training/
+│   │   ├── __init__.py
+│   │   ├── train.py           # Model training script
+│   │   └── evaluate.py        # Model evaluation utilities
+│   └── utils/
+│       ├── __init__.py
+│       └── label_mapping.py   # Character mapping utilities
 ├── openspec/                   # Project documentation
 └── README.md                   # This file
 ```
