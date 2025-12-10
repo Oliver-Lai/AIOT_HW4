@@ -2,7 +2,7 @@
 # Only essential packages for running the web app
 
 # Deep Learning Framework (CPU-only for smaller size)
-tensorflow-cpu>=2.16.0,<2.21.0
+tensorflow-cpu
 
 # Web Framework
 streamlit>=1.25.0,<2.0.0
