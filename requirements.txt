@@ -10,7 +10,7 @@ streamlit
 streamlit-drawable-canvas
 
 # Core Scientific Computing
-numpy>=1.23.0,<2.0.0
+numpy
 
 # Image Processing (headless version, no GUI dependencies)
 opencv-python-headless
