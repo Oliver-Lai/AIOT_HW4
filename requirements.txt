@@ -2,8 +2,7 @@
 # Only essential packages for running the web app
 
 # Deep Learning Framework (CPU-only for smaller size)
-tensorflow-cpu
-
+tensorflow
 # Web Framework
 streamlit
 
