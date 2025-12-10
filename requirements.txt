@@ -5,14 +5,14 @@
 tensorflow-cpu
 
 # Web Framework
-streamlit>=1.25.0,<2.0.0
+streamlit
 
 # Interactive Drawing Component
-streamlit-drawable-canvas>=0.9.0
+streamlit-drawable-canvas
 
 # Core Scientific Computing
 numpy>=1.23.0,<2.0.0
 
 # Image Processing (headless version, no GUI dependencies)
-opencv-python-headless>=4.7.0,<5.0.0
-Pillow>=9.0.0,<11.0.0
+opencv-python-headless
+Pillow
